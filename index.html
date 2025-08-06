@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React + ToastUI</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- TUI Grid & Picker CSS -->
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/grid/latest/tui-grid.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/date-picker/latest/tui-date-picker.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/time-picker/latest/tui-time-picker.min.css"
+    />
+
+    <!-- TUI Grid & Picker JS -->
+    <!-- 주의: tui-grid.js 보다 tui-date-picker.js 와 tui-time-picker.js가 먼저 로드되어야 합니다. -->
+    <script src="https://uicdn.toast.com/date-picker/latest/tui-date-picker.min.js"></script>
+    <script src="https://uicdn.toast.com/time-picker/latest/tui-time-picker.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
