@@ -49,7 +49,7 @@ interface ColumnInfo {
     | "datePicker"
     | {
         type: "select" | "datePicker";
-        options?: { [key: string]: unknown };
+        options?: { [key: string]: any };
       };
   validation?: {
     dataType?: "string" | "number";
@@ -57,27 +57,23 @@ interface ColumnInfo {
     min?: number;
     max?: number;
   };
-  onAfterChange?: (ev: unknown) => void;
+  onAfterChange?: (ev: any) => void;
   renderer?: {
-    type: unknown;
-    options?: { [key: string]: unknown };
+    type: any;
+    options?: { [key: string]: any };
   };
 }
 
 // TUI Grid 인스턴스의 타입 정의
 interface GridInstance {
   destroy: () => void;
-  resetData: (data: unknown[]) => void;
-  on: (event: string, handler: (ev: unknown) => void) => void;
-  getRow: (rowKey: number | string) => unknown;
-  appendRow: (row: unknown, options?: { at?: number }) => void;
+  resetData: (data: any[]) => void;
+  on: (event: string, handler: (ev: any) => void) => void;
+  getRow: (rowKey: number | string) => any;
+  appendRow: (row: any, options?: { at?: number }) => void;
   removeRow: (rowKey: number | string) => void;
-  getCheckedRows: () => unknown[];
-  setValue: (
-    rowKey: string | number,
-    columnName: string,
-    value: unknown
-  ) => void;
+  getCheckedRows: () => any[];
+  setValue: (rowKey: string | number, columnName: string, value: any) => void;
   addRowClassName: (rowKey: string | number, className: string) => void;
   removeRowClassName: (rowKey: string | number, className: string) => void;
   check: (rowKey: string | number) => void;
@@ -91,29 +87,21 @@ declare global {
     tui: {
       Grid: new (options: {
         el: HTMLElement;
-        data: unknown[];
+        data: any[];
         columns: ColumnInfo[];
-        [key: string]: unknown;
+        [key: string]: any;
       }) => GridInstance;
     };
   }
 }
 
 // GridWrapper 컴포넌트의 Props 타입을 정의합니다.
-
-// Grid 클릭 이벤트 타입 정의
-interface GridClickEvent {
-  rowKey?: number | string;
-  instance: GridInstance;
-  [key: string]: unknown;
-}
-
 interface GridWrapperProps {
-  data: unknown[];
+  data: any[];
   columns: ColumnInfo[];
-  onGridClick?: (ev: GridClickEvent) => void;
+  onGridClick?: (ev: any) => void;
   onGridReady?: (grid: GridInstance) => void;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 // --- 공통 그리드 래퍼 컴포넌트 ---
@@ -138,10 +126,7 @@ const GridWrapper: FC<GridWrapperProps> = ({
           columns,
           ...options,
         });
-        if (onGridClick)
-          gridInstance.on("click", (ev: unknown) =>
-            onGridClick(ev as GridClickEvent)
-          );
+        if (onGridClick) gridInstance.on("click", onGridClick);
         if (onGridReady) onGridReady(gridInstance);
         instanceRef.current = gridInstance;
       } else {
@@ -198,11 +183,7 @@ const departmentData: DepartmentData[] = departments.map((dept) => ({
 // --- 셀 내 체크박스를 위한 커스텀 렌더러 ---
 class CheckboxRenderer {
   private el: HTMLInputElement;
-  constructor(props: {
-    value: unknown;
-    grid: GridInstance;
-    rowKey: number | string;
-  }) {
+  constructor(props: any) {
     const el = document.createElement("input");
     el.type = "checkbox";
     el.className = "tui-grid-cell-checkbox";
@@ -215,7 +196,7 @@ class CheckboxRenderer {
   getElement() {
     return this.el;
   }
-  render(props: { value: unknown }) {
+  render(props: any) {
     this.el.checked = Boolean(props.value);
   }
 }
@@ -223,7 +204,7 @@ class CheckboxRenderer {
 // --- 역순 행 번호를 위한 커스텀 렌더러 ---
 class DescendingRowNumRenderer {
   private el: HTMLDivElement;
-  constructor(props: { grid: GridInstance; rowKey: number }) {
+  constructor(props: any) {
     const el = document.createElement("div");
     this.el = el;
     this.render(props);
@@ -231,7 +212,7 @@ class DescendingRowNumRenderer {
   getElement() {
     return this.el;
   }
-  render(props: { grid: GridInstance; rowKey: number }) {
+  render(props: any) {
     const rowNum = props.grid.getRowCount() - props.rowKey;
     this.el.innerText = String(rowNum);
   }
@@ -250,7 +231,6 @@ const BasicGrid: FC = () => {
     { header: "점수", name: "score", align: "right", sortable: true },
   ];
 
-  // [수정] 행 선택 시 배경색을 변경하기 위한 테마 옵션
   const selectionTheme = {
     selection: {
       background: "#666666",
@@ -368,6 +348,7 @@ const EditableGrid: FC = () => {
         type: "datePicker",
         options: {
           format: "yyyy-MM-dd",
+          container: document.body, // [수정] 캘린더가 body에 직접 렌더링되도록 설정
         },
       },
     },
@@ -419,16 +400,11 @@ const MasterDetailGrid: FC = () => {
     { header: "입사일", name: "joinDate", align: "center" },
     { header: "점수", name: "score", align: "right" },
   ];
-  interface GridClickEvent {
-    rowKey?: number | string;
-    instance: GridInstance;
-  }
-
-  const handleMasterGridClick = (ev: GridClickEvent) => {
+  const handleMasterGridClick = (ev: any) => {
     if (!ev.rowKey) return;
     const rowData = ev.instance.getRow(ev.rowKey);
-    if (rowData && (rowData as DepartmentData).department)
-      setSelectedDepartment((rowData as DepartmentData).department);
+    if (rowData && rowData.department)
+      setSelectedDepartment(rowData.department);
   };
   useEffect(() => {
     if (selectedDepartment) {
@@ -483,7 +459,7 @@ const CheckboxAndRowManagementGrid: FC = () => {
     gridInstanceRef.current = grid;
   };
 
-  const handleGridClick = (ev: GridClickEvent & { targetType?: string }) => {
+  const handleGridClick = (ev: any) => {
     if (
       ev.targetType !== "cell" ||
       ev.rowKey === null ||
@@ -497,9 +473,7 @@ const CheckboxAndRowManagementGrid: FC = () => {
 
     const rowKey = ev.rowKey;
     const checkedRows = grid.getCheckedRows();
-    const isChecked = checkedRows.some(
-      (row) => (row as { rowKey?: number | string }).rowKey === rowKey
-    );
+    const isChecked = checkedRows.some((row) => row.rowKey === rowKey);
 
     if (isChecked) {
       grid.uncheck(rowKey);
@@ -521,9 +495,7 @@ const CheckboxAndRowManagementGrid: FC = () => {
   const handleDeleteRows = () => {
     const checkedRows = gridInstanceRef.current?.getCheckedRows() || [];
     checkedRows.forEach((row) => {
-      gridInstanceRef.current?.removeRow(
-        (row as { rowKey: number | string }).rowKey
-      );
+      gridInstanceRef.current?.removeRow(row.rowKey);
     });
   };
 
@@ -668,28 +640,6 @@ const Sidebar: FC<SidebarProps> = ({ activeView, setActiveView }) => {
 // --- 메인 App 컴포넌트 ---
 const App: FC = () => {
   const [activeView, setActiveView] = useState<string>("basic");
-
-  useEffect(() => {
-    const styleId = "tui-datepicker-zindex-style";
-    if (document.getElementById(styleId)) {
-      return;
-    }
-    const style = document.createElement("style");
-    style.id = styleId;
-    style.innerHTML = `
-      .tui-datepicker-container {
-        z-index: 9999 !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      const styleElement = document.getElementById(styleId);
-      if (styleElement) {
-        document.head.removeChild(styleElement);
-      }
-    };
-  }, []);
 
   const renderView = () => {
     switch (activeView) {
